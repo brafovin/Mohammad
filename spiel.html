@@ -280,7 +280,6 @@
     }
 
     #timer-bar.lauft {
-      transition: transform 2s linear;
       transform: scaleX(0);
     }
 
@@ -586,13 +585,16 @@
 
     function timerStarten() {
       clearTimeout(zeitTimer);
+      const dauer = punkte >= 50 ? 1500 : 2000;
       timerBar.classList.remove('lauft');
-      timerBar.style.transform = 'scaleX(1)';
-      void timerBar.offsetWidth; // reflow
-      timerBar.classList.add('lauft');
+      timerBar.style.transition = 'none';
+      timerBar.style.transform  = 'scaleX(1)';
+      void timerBar.offsetWidth;
+      timerBar.style.transition = `transform ${dauer / 1000}s linear`;
+      timerBar.style.transform  = 'scaleX(0)';
       zeitTimer = setTimeout(() => {
         if (spielLaeuft) zeigeGameOver('ZU LANGSAM! ⏱️');
-      }, 2000);
+      }, dauer);
     }
 
     function timerStoppen() {
@@ -621,6 +623,8 @@
       explosionEl.classList.remove('aktiv');
       document.body.classList.remove('regenbogen');
       syrienStoppen();
+      timerBar.style.transition = 'none';
+      timerBar.style.transform  = 'scaleX(1)';
       document.body.style.background = '#0d0d1a';
       document.querySelector('.orb1').style.background = '#6366f1';
       document.querySelector('.orb2').style.background = '#ec4899';
@@ -664,6 +668,14 @@
       punkteEl.textContent = punkte;
       punkteEl.classList.add('bump');
       setTimeout(() => punkteEl.classList.remove('bump'), 100);
+
+      // Ab 50: Kreis zurück auf Normalgröße, Timer 1.5s
+      if (punkte === 50) {
+        kreisGroesse = STARTGROESSE;
+        kreisGroesseSetzen(STARTGROESSE);
+        timerBar.style.transition = 'none';
+        timerBar.style.setProperty('transition', 'transform 1.5s linear', 'important');
+      }
 
       // Hintergrundfarbe je nach Score
       if (punkte >= 60) {
