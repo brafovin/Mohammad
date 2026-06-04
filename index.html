@@ -283,24 +283,32 @@
       transform: scaleX(0);
     }
 
-    /* Flashback */
-    @keyframes flashback {
-      0%   { background: #ff0000; }
-      10%  { background: #ff7700; }
-      20%  { background: #ffff00; }
-      30%  { background: #00ff00; }
-      40%  { background: #00ffff; }
-      50%  { background: #0000ff; }
-      60%  { background: #ff00ff; }
-      70%  { background: #ff0088; }
-      80%  { background: #ffffff; }
-      90%  { background: #000000; }
-      100% { background: #ff0000; }
+    /* Flashlight */
+    @keyframes flashlight {
+      0%   { opacity: 0; }
+      10%  { opacity: 1; }
+      20%  { opacity: 0; }
+      35%  { opacity: 0.9; }
+      45%  { opacity: 0; }
+      60%  { opacity: 1; }
+      70%  { opacity: 0; }
+      85%  { opacity: 0.8; }
+      100% { opacity: 0; }
     }
 
-    body.flashback {
-      animation: flashback 0.15s linear infinite !important;
-      transition: none !important;
+    #flashlight {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      pointer-events: none;
+      z-index: 600;
+      opacity: 0;
+      display: none;
+    }
+
+    #flashlight.aktiv {
+      display: block;
+      animation: flashlight 0.3s linear infinite;
     }
 
     /* Regenbogen Hintergrund */
@@ -553,6 +561,7 @@
   <div id="wiederholung">&#x21BA; Neustart</div>
 
   <div id="explosion"></div>
+  <div id="flashlight"></div>
 
   <div id="gameover" onclick="event.stopPropagation()">
     <div id="gameover-grund">DANEBEN!</div>
@@ -651,9 +660,14 @@
       document.querySelectorAll('.syrien-flag').forEach(el => el.remove());
     }
 
-    function flashbackStarten() {
-      document.body.classList.remove('regenbogen');
-      document.body.classList.add('flashback');
+    const flashlightEl = document.getElementById('flashlight');
+
+    function flashlightStarten() {
+      flashlightEl.classList.add('aktiv');
+    }
+
+    function flashlightStoppen() {
+      flashlightEl.classList.remove('aktiv');
     }
 
     function geldExplosion() {
@@ -730,7 +744,7 @@
       explodiert = false;
       explosionEl.classList.remove('aktiv');
       document.body.classList.remove('regenbogen');
-      document.body.classList.remove('flashback');
+      flashlightStoppen();
       syrienStoppen();
       timerBar.style.transition = 'none';
       timerBar.style.transform  = 'scaleX(1)';
@@ -790,7 +804,7 @@
       if (punkte === 100) {
         kreisGroesse = STARTGROESSE;
         kreisGroesseSetzen(STARTGROESSE);
-        flashbackStarten();
+        flashlightStarten();
       }
 
       // Hintergrundfarbe je nach Score
