@@ -530,8 +530,26 @@
     kreis.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!spielLaeuft) return;
+
+      // Prüfen ob Klick wirklich im Kreis-Kreis (nicht nur im Bounding Box)
+      const rect = kreis.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
+      if (dist > rect.width / 2) {
+        // Klick war in der Ecke der Box, nicht im Kreis
+        spielLaeuft = false;
+        finalScoreEl.textContent = punkte;
+        gameoverEl.classList.add('aktiv');
+        return;
+      }
+
       punkte++;
       streak++;
+
+      // schrumpfen
+      kreisGroesse = Math.max(MINGROESSE, kreisGroesse - SCHRUMPF);
+      kreisGroesseSetzen(kreisGroesse);
 
       // update score
       punkteEl.textContent = punkte;
@@ -555,6 +573,14 @@
       if (punkte % 5 === 0) {
         farbIndex = (farbIndex + 1) % farben.length;
         setFarbe(farbIndex);
+      }
+
+      // game over wenn kreis minimum erreicht
+      if (kreisGroesse <= MINGROESSE) {
+        spielLaeuft = false;
+        finalScoreEl.textContent = punkte;
+        gameoverEl.classList.add('aktiv');
+        return;
       }
 
       zufallsPosition();
