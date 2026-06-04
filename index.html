@@ -441,7 +441,71 @@
       box-shadow: 0 0 35px rgba(109,40,217,0.8);
     }
 
-    /* Startscreen */
+    /* Startscreen & Namescreen */
+    #namescreen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0d0d1a;
+      z-index: 1000;
+      gap: 40px;
+    }
+
+    #namescreen.aktiv { display: flex; }
+
+    #namescreen h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 5px;
+      text-shadow: 0 0 20px rgba(99,102,241,0.8);
+    }
+
+    #namescreen p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+    }
+
+    #name-input {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(167,139,250,0.4);
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      outline: none;
+      letter-spacing: 2px;
+      width: 220px;
+    }
+
+    #name-bestaetigen {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: #fff;
+      background: linear-gradient(135deg, #6d28d9, #4c1d95);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-left: 10px;
+      box-shadow: 0 0 15px rgba(109,40,217,0.4);
+    }
+
+    /* Spieler-Name im HUD */
+    #spieler-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 2px;
+    }
+
     #startscreen {
       position: fixed;
       inset: 0;
@@ -527,12 +591,37 @@
     </div>
   </div>
 
+  <!-- NAMENSAUSWAHL -->
+  <div id="namescreen">
+    <h1>Wer bist du?</h1>
+    <p>Wähle deinen Namen</p>
+    <div class="start-buttons">
+      <div class="start-btn" id="btn-dennis">
+        <span class="icon">🧑</span>
+        <span class="label">DENNIS</span>
+      </div>
+      <div class="start-btn" id="btn-mohammad">
+        <span class="icon">🧑</span>
+        <span class="label">MOHAMMAD</span>
+      </div>
+      <div class="start-btn" id="btn-sonstiges">
+        <span class="icon">❓</span>
+        <span class="label">SONSTIGES</span>
+      </div>
+    </div>
+    <div id="sonstiges-input" style="display:none; margin-top:20px; text-align:center;">
+      <input id="name-input" type="text" placeholder="Dein Name..." maxlength="20">
+      <button id="name-bestaetigen">OK</button>
+    </div>
+  </div>
+
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
 
   <div id="hud">
     <div id="titel">Tap Circle</div>
+    <div id="spieler-name"></div>
     <div id="punkte-box">
       <span id="punkte-label">Score</span>
       <div id="punkte">0</div>
@@ -914,18 +1003,41 @@
       }
     }
 
-    const startscreen = document.getElementById('startscreen');
+    const startscreen   = document.getElementById('startscreen');
+    const namescreen    = document.getElementById('namescreen');
+    const spielerNameEl = document.getElementById('spieler-name');
+    let gewaehlterModus = 'mobile';
 
-    function spielStarten(modus) {
-      STARTGROESSE = modus === 'computer' ? 180 : 90;
+    function nameGewaehlt(name) {
+      spielerNameEl.textContent = '👤 ' + name;
+      namescreen.classList.remove('aktiv');
+      STARTGROESSE = gewaehlterModus === 'computer' ? 180 : 90;
       kreis.style.width  = STARTGROESSE + 'px';
       kreis.style.height = STARTGROESSE + 'px';
-      startscreen.style.display = 'none';
       neustart();
     }
 
-    document.getElementById('btn-mobile').addEventListener('click', () => spielStarten('mobile'));
-    document.getElementById('btn-computer').addEventListener('click', () => spielStarten('computer'));
+    function modusGewaehlt(modus) {
+      gewaehlterModus = modus;
+      startscreen.style.display = 'none';
+      namescreen.classList.add('aktiv');
+    }
+
+    document.getElementById('btn-mobile').addEventListener('click', () => modusGewaehlt('mobile'));
+    document.getElementById('btn-computer').addEventListener('click', () => modusGewaehlt('computer'));
+
+    document.getElementById('btn-dennis').addEventListener('click', () => nameGewaehlt('Dennis'));
+    document.getElementById('btn-mohammad').addEventListener('click', () => nameGewaehlt('Mohammad'));
+    document.getElementById('btn-sonstiges').addEventListener('click', () => {
+      document.getElementById('sonstiges-input').style.display = 'flex';
+      document.getElementById('sonstiges-input').style.gap = '10px';
+      document.getElementById('sonstiges-input').style.alignItems = 'center';
+      document.getElementById('sonstiges-input').style.justifyContent = 'center';
+    });
+    document.getElementById('name-bestaetigen').addEventListener('click', () => {
+      const val = document.getElementById('name-input').value.trim();
+      nameGewaehlt(val || 'Spieler');
+    });
   </script>
 </body>
 </html>
