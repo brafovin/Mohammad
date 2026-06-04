@@ -392,7 +392,7 @@
   <div id="wiederholung">&#x21BA; Wiederholung</div>
 
   <!-- GAME OVER SCREEN -->
-  <div id="gameover">
+  <div id="gameover" onclick="event.stopPropagation()">
     <p id="gameover-grund">DANEBEN!</p>
     <div class="final-score" id="final-score">0</div>
     <p>Punkte erreicht</p>
@@ -427,12 +427,14 @@
       kreisGroesse = STARTGROESSE;
       streak = 0;
       farbIndex = 0;
-      spielLaeuft = true;
       punkteEl.textContent = '0';
       kreisGroesseSetzen(STARTGROESSE);
       setFarbe(0);
       gameoverEl.classList.remove('aktiv');
       zufallsPosition();
+      // kurze Verzögerung bevor spielLaeuft wieder true wird
+      // damit der Klick auf "Nochmal versuchen" nicht sofort Game Over auslöst
+      setTimeout(() => { spielLaeuft = true; }, 300);
     }
 
     document.getElementById('wiederholung').addEventListener('click', neustart);
