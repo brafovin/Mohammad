@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kreis-Tipp-Spiel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d0d1a;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Inter', Arial, sans-serif;
+      user-select: none;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 8s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes gridMove {
+      0%   { transform: translateY(0); }
+      100% { transform: translateY(50px); }
+    }
+
+    /* Glow orbs in background */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      pointer-events: none;
+      animation: orbPulse 4s ease-in-out infinite alternate;
+    }
+    .orb1 { width: 400px; height: 400px; background: #6366f1; top: -100px; left: -100px; }
+    .orb2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; right: -80px; animation-delay: 2s; }
+    .orb3 { width: 200px; height: 200px; background: #06b6d4; top: 40%; left: 40%; animation-delay: 1s; }
+
+    @keyframes orbPulse {
+      from { transform: scale(1); opacity: 0.1; }
+      to   { transform: scale(1.2); opacity: 0.2; }
+    }
+
+    /* Top HUD */
+    #hud {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      z-index: 100;
+    }
+
+    #titel {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    #punkte-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #punkte-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    #punkte {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(99,102,241,0.8), 0 0 40px rgba(99,102,241,0.4);
+      min-width: 60px;
+      text-align: right;
+      transition: transform 0.1s;
+    }
+
+    #punkte.bump {
+      transform: scale(1.3);
+    }
+
+    #bestenliste-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #best-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 1px;
+    }
+
+    #best-wert {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px;
+      color: #fbbf24;
+      text-shadow: 0 0 10px rgba(251,191,36,0.5);
+    }
+
+    /* Combo streak */
+    #combo {
+      position: fixed;
+      top: 90px;
+      right: 30px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      color: #f472b6;
+      text-shadow: 0 0 10px rgba(244,114,182,0.7);
+      opacity: 0;
+      transition: opacity 0.3s;
+      letter-spacing: 2px;
+    }
+
+    #combo.sichtbar { opacity: 1; }
+
+    /* THE CIRCLE */
+    #kreis {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: left 0.05s, top 0.05s;
+    }
+
+    #kreis-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #a78bfa, #6d28d9 60%, #4c1d95);
+      box-shadow:
+        0 0 0 3px rgba(167,139,250,0.4),
+        0 0 30px rgba(109,40,217,0.8),
+        0 0 60px rgba(109,40,217,0.4),
+        inset 0 2px 6px rgba(255,255,255,0.3);
+      transition: transform 0.08s, box-shadow 0.08s;
+      animation: kreisFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes kreisFloat {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50%       { transform: translateY(-8px) scale(1.02); }
+    }
+
+    #kreis:active .kreis-inner,
+    #kreis.getippt .kreis-inner {
+      transform: scale(0.85) !important;
+      box-shadow: 0 0 60px rgba(167,139,250,1), 0 0 100px rgba(109,40,217,0.6) !important;
+      animation: none !important;
+    }
+
+    /* Pulse ring around circle */
+    #kreis::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(167,139,250,0.3);
+      animation: ringPulse 2s ease-in-out infinite;
+    }
+
+    #kreis::after {
+      content: '';
+      position: absolute;
+      inset: -18px;
+      border-radius: 50%;
+      border: 1px solid rgba(167,139,250,0.15);
+      animation: ringPulse 2s ease-in-out infinite 0.5s;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50%       { transform: scale(1.1); opacity: 0.1; }
+    }
+
+    /* +1 popup */
+    .plus-eins {
+      position: absolute;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(167,139,250,1), 0 0 20px rgba(167,139,250,0.5);
+      pointer-events: none;
+      animation: hochfliegen 0.9s ease-out forwards;
+      z-index: 200;
+    }
+
+    @keyframes hochfliegen {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      20%  { transform: translateY(-15px) scale(1.3); }
+      100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
+    }
+
+    /* Ripple on click */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(167,139,250,0.8);
+      pointer-events: none;
+      animation: rippleOut 0.6s ease-out forwards;
+      z-index: 150;
+    }
+
+    @keyframes rippleOut {
+      0%   { width: 90px; height: 90px; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { width: 90px; height: 90px; opacity: 0; transform: translate(-50%, -50%) scale(3); }
+    }
+
+    /* Bottom bar */
+    #bottombar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.02);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    #bottombar span {
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* Particle burst */
+    .partikel {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: partikelFly 0.7s ease-out forwards;
+      z-index: 180;
+    }
+
+    @keyframes partikelFly {
+      0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <!-- TOP HUD -->
+  <div id="hud">
+    <div id="titel">Tap Circle</div>
+    <div id="punkte-box">
+      <span id="punkte-label">Score</span>
+      <div id="punkte">0</div>
+    </div>
+    <div id="bestenliste-box">
+      <span id="best-label">BEST</span>
+      <div id="best-wert">0</div>
+    </div>
+  </div>
+
+  <div id="combo"></div>
+
+  <!-- CIRCLE -->
+  <div id="kreis">
+    <div id="kreis-inner" class="kreis-inner"></div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div id="bottombar">
+    <span>Tippe den Kreis</span>
+  </div>
+
+  <script>
+    let punkte = 0;
+    let best = parseInt(localStorage.getItem('best') || '0');
+    let comboTimer = null;
+
+    const kreis = document.getElementById('kreis');
+    const punkteEl = document.getElementById('punkte');
+    const bestEl = document.getElementById('best-wert');
+    const comboEl = document.getElementById('combo');
+
+    bestEl.textContent = best;
+
+    const farben = [
+      ['#a78bfa','#6d28d9','#4c1d95', 'rgba(109,40,217'],
+      ['#f472b6','#db2777','#9d174d', 'rgba(219,39,119'],
+      ['#34d399','#059669','#064e3b', 'rgba(5,150,105'],
+      ['#60a5fa','#2563eb','#1e3a8a', 'rgba(37,99,235'],
+      ['#fb923c','#ea580c','#7c2d12', 'rgba(234,88,12'],
+    ];
+    let farbIndex = 0;
+
+    function setFarbe(idx) {
+      const [h, m, d, g] = farben[idx];
+      const inner = document.getElementById('kreis-inner');
+      inner.style.background = `radial-gradient(circle at 35% 30%, ${h}, ${m} 60%, ${d})`;
+      inner.style.boxShadow = `
+        0 0 0 3px ${h}66,
+        0 0 30px ${g},0.8),
+        0 0 60px ${g},0.4),
+        inset 0 2px 6px rgba(255,255,255,0.3)`;
+    }
+
+    function zufallsPosition() {
+      const margin = 80;
+      const topOff = 90;
+      const botOff = 75;
+      const x = margin + Math.random() * (window.innerWidth - 2 * margin);
+      const y = topOff + margin + Math.random() * (window.innerHeight - topOff - botOff - 2 * margin);
+      kreis.style.left = (x - 45) + 'px';
+      kreis.style.top  = (y - 45) + 'px';
+    }
+
+    function plusEins(x, y) {
+      const el = document.createElement('div');
+      el.className = 'plus-eins';
+      el.textContent = '+1';
+      el.style.left = (x - 15) + 'px';
+      el.style.top  = (y - 20) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 900);
+    }
+
+    function ripple(x, y) {
+      const el = document.createElement('div');
+      el.className = 'ripple';
+      el.style.left = x + 'px';
+      el.style.top  = y + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 600);
+    }
+
+    function partikelBurst(x, y) {
+      const colors = ['#a78bfa','#f472b6','#60a5fa','#34d399','#fbbf24'];
+      for (let i = 0; i < 10; i++) {
+        const el = document.createElement('div');
+        el.className = 'partikel';
+        const angle = (i / 10) * 2 * Math.PI;
+        const dist = 40 + Math.random() * 40;
+        el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+        el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+        el.style.background = colors[i % colors.length];
+        el.style.left = x + 'px';
+        el.style.top  = y + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 700);
+      }
+    }
+
+    function updateCombo(count) {
+      clearTimeout(comboTimer);
+      if (count >= 5) {
+        const msgs = ['', '', '', '', 'HOT STREAK x5!', 'ON FIRE x6!', 'UNSTOPPABLE x7!', 'INSANE x8!', 'GODLIKE x9!', 'LEGENDARY x10+!'];
+        comboEl.textContent = msgs[Math.min(count, 10)] || `BEAST MODE x${count}!`;
+        comboEl.classList.add('sichtbar');
+        comboTimer = setTimeout(() => comboEl.classList.remove('sichtbar'), 1500);
+      }
+    }
+
+    let streak = 0;
+    kreis.addEventListener('click', (e) => {
+      punkte++;
+      streak++;
+
+      // update score
+      punkteEl.textContent = punkte;
+      punkteEl.classList.add('bump');
+      setTimeout(() => punkteEl.classList.remove('bump'), 100);
+
+      // best score
+      if (punkte > best) {
+        best = punkte;
+        bestEl.textContent = best;
+        localStorage.setItem('best', best);
+      }
+
+      // effects
+      plusEins(e.clientX, e.clientY);
+      ripple(e.clientX, e.clientY);
+      partikelBurst(e.clientX, e.clientY);
+      updateCombo(streak);
+
+      // change color every 5 clicks
+      if (punkte % 5 === 0) {
+        farbIndex = (farbIndex + 1) % farben.length;
+        setFarbe(farbIndex);
+      }
+
+      zufallsPosition();
+    });
+
+    zufallsPosition();
+  </script>
+</body>
+</html>
