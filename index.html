@@ -502,10 +502,11 @@
 
     function syrienStarten() {
       if (syrienInterval) return;
+      const flaggen = ['🇸🇾','🇸🇾','🇸🇾','🇩🇪','🇩🇪','🇩🇪','🇦🇫','🇦🇫','🇦🇫'];
       syrienInterval = setInterval(() => {
         const el = document.createElement('div');
         el.className = 'syrien-flag';
-        el.textContent = '🇸🇾';
+        el.textContent = flaggen[Math.floor(Math.random() * flaggen.length)];
         const startX = Math.random() * window.innerWidth;
         const startY = Math.random() * window.innerHeight;
         const endX   = startX + (Math.random() - 0.5) * 600;
