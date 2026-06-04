@@ -266,6 +266,34 @@
       transform: scaleX(0);
     }
 
+    /* Regenbogen Hintergrund */
+    @keyframes regenbogen {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body.regenbogen {
+      background: linear-gradient(270deg, #ff0000, #ff7700, #ffff00, #00ff00, #0000ff, #8b00ff, #ff0000) !important;
+      background-size: 400% 400% !important;
+      animation: regenbogen 2s ease infinite !important;
+      transition: none !important;
+    }
+
+    /* Fliegende Syrien Emojis */
+    .syrien-flag {
+      position: fixed;
+      font-size: 40px;
+      pointer-events: none;
+      z-index: 400;
+      animation: flagFly var(--dur) linear infinite;
+    }
+
+    @keyframes flagFly {
+      0%   { transform: translate(var(--sx), var(--sy)) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--ex), var(--ey)) rotate(var(--rot)); opacity: 0.7; }
+    }
+
     #bottombar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -470,6 +498,38 @@
       kreis.style.top  = (y - half) + 'px';
     }
 
+    let syrienInterval = null;
+
+    function syrienStarten() {
+      if (syrienInterval) return;
+      syrienInterval = setInterval(() => {
+        const el = document.createElement('div');
+        el.className = 'syrien-flag';
+        el.textContent = '🇸🇾';
+        const startX = Math.random() * window.innerWidth;
+        const startY = Math.random() * window.innerHeight;
+        const endX   = startX + (Math.random() - 0.5) * 600;
+        const endY   = startY + (Math.random() - 0.5) * 600;
+        const dur    = (2 + Math.random() * 3).toFixed(1) + 's';
+        el.style.setProperty('--sx', startX + 'px');
+        el.style.setProperty('--sy', startY + 'px');
+        el.style.setProperty('--ex', endX + 'px');
+        el.style.setProperty('--ey', endY + 'px');
+        el.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+        el.style.setProperty('--dur', dur);
+        el.style.left = '0';
+        el.style.top  = '0';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), parseFloat(dur) * 1000);
+      }, 200);
+    }
+
+    function syrienStoppen() {
+      clearInterval(syrienInterval);
+      syrienInterval = null;
+      document.querySelectorAll('.syrien-flag').forEach(el => el.remove());
+    }
+
     function geldExplosion() {
       if (explodiert) return;
       explodiert = true;
@@ -540,6 +600,8 @@
       setFarbe(0);
       explodiert = false;
       explosionEl.classList.remove('aktiv');
+      document.body.classList.remove('regenbogen');
+      syrienStoppen();
       document.body.style.background = '#0d0d1a';
       document.querySelector('.orb1').style.background = '#6366f1';
       document.querySelector('.orb2').style.background = '#ec4899';
@@ -585,7 +647,10 @@
       setTimeout(() => punkteEl.classList.remove('bump'), 100);
 
       // Hintergrundfarbe je nach Score
-      if (punkte >= 40) {
+      if (punkte >= 60) {
+        document.body.classList.add('regenbogen');
+        syrienStarten();
+      } else if (punkte >= 40) {
         geldExplosion();
       } else if (punkte >= 30) {
         document.body.style.background = '#1a1a00';
