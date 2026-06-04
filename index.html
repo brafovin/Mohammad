@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Kreis-Tipp-Spiel</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600&display=swap');
@@ -499,6 +499,30 @@
     }
 
     /* Rangliste */
+    /* Mobile Modus Anpassungen */
+    body.mobile-modus #hud { height: 50px; padding: 0 14px; }
+    body.mobile-modus #titel { font-size: 11px; letter-spacing: 2px; }
+    body.mobile-modus #punkte { font-size: 22px; }
+    body.mobile-modus #best-wert { font-size: 14px; }
+    body.mobile-modus #spieler-name { font-size: 10px; }
+    body.mobile-modus #timer-bar-wrap { top: 50px; }
+    body.mobile-modus #combo { top: 60px; font-size: 11px; }
+    body.mobile-modus #rangliste { top: 62px; padding: 8px 12px; min-width: 130px; }
+    body.mobile-modus #rangliste-titel { font-size: 9px; }
+    body.mobile-modus .rang-name { font-size: 9px; }
+    body.mobile-modus .rang-score { font-size: 10px; }
+    body.mobile-modus #bottombar { height: 44px; }
+    body.mobile-modus #bottombar span { font-size: 10px; }
+    body.mobile-modus #wiederholung { font-size: 9px; padding: 6px 12px; bottom: 10px; }
+    body.mobile-modus .start-btn { width: 130px; height: 130px; }
+    body.mobile-modus .start-btn .icon { font-size: 36px; }
+    body.mobile-modus .start-btn .label { font-size: 11px; }
+    body.mobile-modus #startscreen h1,
+    body.mobile-modus #namescreen h1 { font-size: 20px; }
+
+    /* Touch-Optimierung */
+    body.mobile-modus * { -webkit-tap-highlight-color: transparent; }
+
     #rangliste {
       position: fixed;
       top: 80px;
@@ -1124,6 +1148,11 @@
 
     function modusGewaehlt(modus) {
       gewaehlterModus = modus;
+      if (modus === 'mobile') {
+        document.body.classList.add('mobile-modus');
+      } else {
+        document.body.classList.remove('mobile-modus');
+      }
       startscreen.style.display = 'none';
       namescreen.classList.add('aktiv');
     }
