@@ -299,8 +299,8 @@
     #gameover h2 {
       font-family: 'Orbitron', sans-serif;
       font-size: 36px;
-      color: #fff;
-      text-shadow: 0 0 30px rgba(167,139,250,0.8);
+      color: #ff4d4d;
+      text-shadow: 0 0 30px rgba(255,77,77,0.8);
       letter-spacing: 4px;
     }
 
@@ -393,10 +393,10 @@
 
   <!-- GAME OVER SCREEN -->
   <div id="gameover">
-    <p>GAME OVER</p>
+    <p id="gameover-grund">DANEBEN!</p>
     <div class="final-score" id="final-score">0</div>
     <p>Punkte erreicht</p>
-    <button onclick="neustart()">&#x21BA; Nochmal spielen</button>
+    <button onclick="neustart()">&#x21BA; Nochmal versuchen</button>
   </div>
 
   <script>
@@ -518,13 +518,20 @@
     let streak = 0;
     let spielLaeuft = true;
 
+    const gameoverGrund = document.getElementById('gameover-grund');
+
+    function zeigeGameOver(grund) {
+      spielLaeuft = false;
+      finalScoreEl.textContent = punkte;
+      gameoverGrund.textContent = grund;
+      gameoverEl.classList.add('aktiv');
+    }
+
     // Klick AUSSERHALB des Kreises → Game Over
     document.addEventListener('click', (e) => {
       if (!spielLaeuft) return;
       if (!kreis.contains(e.target)) {
-        spielLaeuft = false;
-        finalScoreEl.textContent = punkte;
-        gameoverEl.classList.add('aktiv');
+        zeigeGameOver('DANEBEN!');
       }
     });
 
@@ -538,10 +545,7 @@
       const cy = rect.top + rect.height / 2;
       const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
       if (dist > rect.width / 2) {
-        // Klick war in der Ecke der Box, nicht im Kreis
-        spielLaeuft = false;
-        finalScoreEl.textContent = punkte;
-        gameoverEl.classList.add('aktiv');
+        zeigeGameOver('DANEBEN!');
         return;
       }
 
@@ -578,9 +582,7 @@
 
       // game over wenn kreis minimum erreicht
       if (kreisGroesse <= MINGROESSE) {
-        spielLaeuft = false;
-        finalScoreEl.textContent = punkte;
-        gameoverEl.classList.add('aktiv');
+        zeigeGameOver('ZU KLEIN!');
         return;
       }
 
