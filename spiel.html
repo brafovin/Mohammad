@@ -498,6 +498,68 @@
       box-shadow: 0 0 15px rgba(109,40,217,0.4);
     }
 
+    /* Rangliste */
+    #rangliste {
+      position: fixed;
+      top: 80px;
+      left: 16px;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px 16px;
+      z-index: 100;
+      min-width: 160px;
+    }
+
+    #rangliste-titel {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #fbbf24;
+      text-shadow: 0 0 8px rgba(251,191,36,0.5);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .rang-eintrag {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 12px;
+    }
+
+    .rang-eintrag:last-child { border-bottom: none; }
+
+    .rang-pos {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      min-width: 16px;
+    }
+
+    .rang-pos.gold   { color: #fbbf24; text-shadow: 0 0 6px rgba(251,191,36,0.7); }
+    .rang-pos.silber { color: #9ca3af; }
+    .rang-pos.bronze { color: #b45309; }
+
+    .rang-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      color: #fff;
+      flex: 1;
+      letter-spacing: 1px;
+    }
+
+    .rang-score {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      color: #a78bfa;
+      font-weight: 700;
+    }
+
     /* Spieler-Name im HUD */
     #spieler-name {
       font-family: 'Orbitron', sans-serif;
@@ -630,6 +692,12 @@
       <span id="best-label">BEST</span>
       <div id="best-wert">0</div>
     </div>
+  </div>
+
+  <!-- RANGLISTE -->
+  <div id="rangliste">
+    <div id="rangliste-titel">🏆 Rangliste</div>
+    <div id="rangliste-liste"></div>
   </div>
 
   <div id="combo"></div>
@@ -820,6 +888,8 @@
       grundEl.textContent      = grund;
       finalScoreEl.textContent = punkte;
       gameoverEl.classList.add('aktiv');
+      const name = spielerNameEl.textContent.replace('👤 ', '') || 'Spieler';
+      ranglisteSpeichern(name, punkte);
     }
 
     function neustart() {
@@ -1003,6 +1073,41 @@
       }
     }
 
+    // Rangliste aus localStorage laden
+    let rangliste = JSON.parse(localStorage.getItem('rangliste') || '[]');
+
+    function ranglisteAnzeigen() {
+      const liste = document.getElementById('rangliste-liste');
+      liste.innerHTML = '';
+      const sortiert = [...rangliste].sort((a, b) => b.score - a.score).slice(0, 5);
+      const medals = ['gold', 'silber', 'bronze'];
+      if (sortiert.length === 0) {
+        liste.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:1px;">Noch leer</div>';
+        return;
+      }
+      sortiert.forEach((e, i) => {
+        const div = document.createElement('div');
+        div.className = 'rang-eintrag';
+        div.innerHTML = `
+          <span class="rang-pos ${medals[i] || ''}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1)+'.'}</span>
+          <span class="rang-name">${e.name}</span>
+          <span class="rang-score">${e.score}</span>`;
+        liste.appendChild(div);
+      });
+    }
+
+    function ranglisteSpeichern(name, score) {
+      if (score === 0) return;
+      const existing = rangliste.find(e => e.name === name);
+      if (existing) {
+        if (score > existing.score) existing.score = score;
+      } else {
+        rangliste.push({ name, score });
+      }
+      localStorage.setItem('rangliste', JSON.stringify(rangliste));
+      ranglisteAnzeigen();
+    }
+
     const startscreen   = document.getElementById('startscreen');
     const namescreen    = document.getElementById('namescreen');
     const spielerNameEl = document.getElementById('spieler-name');
@@ -1038,6 +1143,8 @@
       const val = document.getElementById('name-input').value.trim();
       nameGewaehlt(val || 'Spieler');
     });
+
+    ranglisteAnzeigen();
   </script>
 </body>
 </html>
