@@ -18,7 +18,6 @@
       user-select: none;
     }
 
-    /* Animated background grid */
     body::before {
       content: '';
       position: fixed;
@@ -36,7 +35,6 @@
       100% { transform: translateY(50px); }
     }
 
-    /* Glow orbs in background */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -50,11 +48,10 @@
     .orb3 { width: 200px; height: 200px; background: #06b6d4; top: 40%; left: 40%; animation-delay: 1s; }
 
     @keyframes orbPulse {
-      from { transform: scale(1); opacity: 0.1; }
-      to   { transform: scale(1.2); opacity: 0.2; }
+      from { transform: scale(1);   opacity: 0.10; }
+      to   { transform: scale(1.2); opacity: 0.20; }
     }
 
-    /* Top HUD */
     #hud {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -77,11 +74,7 @@
       text-transform: uppercase;
     }
 
-    #punkte-box {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    #punkte-box { display: flex; align-items: center; gap: 12px; }
 
     #punkte-label {
       font-size: 13px;
@@ -101,15 +94,9 @@
       transition: transform 0.1s;
     }
 
-    #punkte.bump {
-      transform: scale(1.3);
-    }
+    #punkte.bump { transform: scale(1.3); }
 
-    #bestenliste-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    #best-box { display: flex; align-items: center; gap: 8px; }
 
     #best-label {
       font-size: 12px;
@@ -124,7 +111,6 @@
       text-shadow: 0 0 10px rgba(251,191,36,0.5);
     }
 
-    /* Combo streak */
     #combo {
       position: fixed;
       top: 90px;
@@ -136,18 +122,16 @@
       opacity: 0;
       transition: opacity 0.3s;
       letter-spacing: 2px;
+      z-index: 100;
     }
-
     #combo.sichtbar { opacity: 1; }
 
-    /* THE CIRCLE */
     #kreis {
       position: absolute;
       width: 90px;
       height: 90px;
       border-radius: 50%;
       cursor: pointer;
-      transition: left 0.05s, top 0.05s;
     }
 
     #kreis-inner {
@@ -160,8 +144,8 @@
         0 0 30px rgba(109,40,217,0.8),
         0 0 60px rgba(109,40,217,0.4),
         inset 0 2px 6px rgba(255,255,255,0.3);
-      transition: transform 0.08s, box-shadow 0.08s;
       animation: kreisFloat 3s ease-in-out infinite;
+      transition: transform 0.08s;
     }
 
     @keyframes kreisFloat {
@@ -169,14 +153,6 @@
       50%       { transform: translateY(-8px) scale(1.02); }
     }
 
-    #kreis:active .kreis-inner,
-    #kreis.getippt .kreis-inner {
-      transform: scale(0.85) !important;
-      box-shadow: 0 0 60px rgba(167,139,250,1), 0 0 100px rgba(109,40,217,0.6) !important;
-      animation: none !important;
-    }
-
-    /* Pulse ring around circle */
     #kreis::before {
       content: '';
       position: absolute;
@@ -196,18 +172,13 @@
     }
 
     @keyframes ringPulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
+      0%, 100% { transform: scale(1);   opacity: 0.5; }
       50%       { transform: scale(1.1); opacity: 0.1; }
     }
 
-    /* +1 popup */
-    .plus-eins {
+    .emoji-pop {
       position: absolute;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 20px;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 0 0 10px rgba(167,139,250,1), 0 0 20px rgba(167,139,250,0.5);
+      font-size: 30px;
       pointer-events: none;
       animation: hochfliegen 0.9s ease-out forwards;
       z-index: 200;
@@ -219,7 +190,6 @@
       100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
     }
 
-    /* Ripple on click */
     .ripple {
       position: absolute;
       border-radius: 50%;
@@ -230,11 +200,25 @@
     }
 
     @keyframes rippleOut {
-      0%   { width: 90px; height: 90px; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-      100% { width: 90px; height: 90px; opacity: 0; transform: translate(-50%, -50%) scale(3); }
+      0%   { width: 90px; height: 90px; opacity: 1; transform: translate(-50%,-50%) scale(1); }
+      100% { width: 90px; height: 90px; opacity: 0; transform: translate(-50%,-50%) scale(3); }
     }
 
-    /* Bottom bar */
+    .partikel {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: partikelFly 0.7s ease-out forwards;
+      z-index: 180;
+    }
+
+    @keyframes partikelFly {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--dx),var(--dy)) scale(0); }
+    }
+
     #bottombar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -242,7 +226,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
       background: rgba(255,255,255,0.02);
       backdrop-filter: blur(8px);
       border-top: 1px solid rgba(255,255,255,0.05);
@@ -255,7 +238,6 @@
       text-transform: uppercase;
     }
 
-    /* Wiederholung button */
     #wiederholung {
       position: fixed;
       bottom: 15px;
@@ -277,10 +259,8 @@
     #wiederholung:hover {
       background: rgba(255,255,255,0.1);
       color: #fff;
-      border-color: rgba(255,255,255,0.3);
     }
 
-    /* Game Over overlay */
     #gameover {
       position: fixed;
       inset: 0;
@@ -288,72 +268,57 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(14px);
       z-index: 300;
-      gap: 20px;
+      gap: 22px;
     }
 
     #gameover.aktiv { display: flex; }
 
-    #gameover h2 {
+    #gameover-grund {
       font-family: 'Orbitron', sans-serif;
-      font-size: 36px;
+      font-size: 40px;
+      font-weight: 900;
       color: #ff4d4d;
       text-shadow: 0 0 30px rgba(255,77,77,0.8);
       letter-spacing: 4px;
     }
 
-    #gameover p {
+    .final-score {
       font-family: 'Orbitron', sans-serif;
-      font-size: 16px;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 2px;
-    }
-
-    #gameover .final-score {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 64px;
+      font-size: 72px;
       font-weight: 900;
       color: #a78bfa;
       text-shadow: 0 0 40px rgba(167,139,250,0.8);
     }
 
+    #gameover-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
     #gameover button {
       font-family: 'Orbitron', sans-serif;
-      font-size: 13px;
+      font-size: 14px;
       letter-spacing: 3px;
       text-transform: uppercase;
       color: #fff;
       background: linear-gradient(135deg, #6d28d9, #4c1d95);
       border: none;
-      padding: 14px 32px;
+      padding: 16px 36px;
       border-radius: 30px;
       cursor: pointer;
       box-shadow: 0 0 20px rgba(109,40,217,0.5);
       transition: transform 0.1s, box-shadow 0.1s;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     #gameover button:hover {
       transform: scale(1.05);
       box-shadow: 0 0 35px rgba(109,40,217,0.8);
-    }
-
-    /* Particle burst */
-    .partikel {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: partikelFly 0.7s ease-out forwards;
-      z-index: 180;
-    }
-
-    @keyframes partikelFly {
-      0%   { opacity: 1; transform: translate(0, 0) scale(1); }
-      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
     }
   </style>
 </head>
@@ -363,14 +328,13 @@
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
 
-  <!-- TOP HUD -->
   <div id="hud">
     <div id="titel">Tap Circle</div>
     <div id="punkte-box">
       <span id="punkte-label">Score</span>
       <div id="punkte">0</div>
     </div>
-    <div id="bestenliste-box">
+    <div id="best-box">
       <span id="best-label">BEST</span>
       <div id="best-wert">0</div>
     </div>
@@ -378,125 +342,186 @@
 
   <div id="combo"></div>
 
-  <!-- CIRCLE -->
   <div id="kreis">
-    <div id="kreis-inner" class="kreis-inner"></div>
+    <div id="kreis-inner"></div>
   </div>
 
-  <!-- BOTTOM BAR -->
   <div id="bottombar">
     <span>Tippe den Kreis</span>
   </div>
 
-  <!-- WIEDERHOLUNG BUTTON -->
-  <div id="wiederholung">&#x21BA; Wiederholung</div>
+  <div id="wiederholung">&#x21BA; Neustart</div>
 
-  <!-- GAME OVER SCREEN -->
   <div id="gameover" onclick="event.stopPropagation()">
-    <p id="gameover-grund">DANEBEN!</p>
+    <div id="gameover-grund">DANEBEN!</div>
     <div class="final-score" id="final-score">0</div>
-    <p>Punkte erreicht</p>
-    <button onclick="neustart()">&#x21BA; Nochmal versuchen</button>
+    <div id="gameover-sub">Punkte erreicht</div>
+    <button id="neustart-btn">&#x21BA; Nochmal versuchen</button>
   </div>
 
   <script>
-    let punkte = 0;
-    let best = parseInt(localStorage.getItem('best') || '0');
-    let comboTimer = null;
     const STARTGROESSE = 90;
-    const MINGROESSE = 12;
-    const SCHRUMPF = 1.5; // px pro klick
-    let kreisGroesse = STARTGROESSE;
+    const MINGROESSE   = 15;
+    const SCHRUMPF     = 1.5;
 
-    const kreis = document.getElementById('kreis');
-    const punkteEl = document.getElementById('punkte');
-    const bestEl = document.getElementById('best-wert');
-    const comboEl = document.getElementById('combo');
-    const gameoverEl = document.getElementById('gameover');
+    let punkte       = 0;
+    let kreisGroesse = STARTGROESSE;
+    let streak       = 0;
+    let farbIndex    = 0;
+    let spielLaeuft  = false;
+    let comboTimer   = null;
+    let best         = parseInt(localStorage.getItem('best') || '0');
+
+    const kreis        = document.getElementById('kreis');
+    const kreisInner   = document.getElementById('kreis-inner');
+    const punkteEl     = document.getElementById('punkte');
+    const bestEl       = document.getElementById('best-wert');
+    const comboEl      = document.getElementById('combo');
+    const gameoverEl   = document.getElementById('gameover');
+    const grundEl      = document.getElementById('gameover-grund');
     const finalScoreEl = document.getElementById('final-score');
 
     bestEl.textContent = best;
 
-    function kreisGroesseSetzen(groesse) {
-      kreis.style.width  = groesse + 'px';
-      kreis.style.height = groesse + 'px';
-    }
-
-    function neustart() {
-      punkte = 0;
-      kreisGroesse = STARTGROESSE;
-      streak = 0;
-      farbIndex = 0;
-      punkteEl.textContent = '0';
-      kreisGroesseSetzen(STARTGROESSE);
-      setFarbe(0);
-      gameoverEl.classList.remove('aktiv');
-      zufallsPosition();
-      // kurze Verzögerung bevor spielLaeuft wieder true wird
-      // damit der Klick auf "Nochmal versuchen" nicht sofort Game Over auslöst
-      setTimeout(() => { spielLaeuft = true; }, 300);
-    }
-
-    document.getElementById('wiederholung').addEventListener('click', neustart);
-
     const farben = [
-      ['#a78bfa','#6d28d9','#4c1d95', 'rgba(109,40,217'],
-      ['#f472b6','#db2777','#9d174d', 'rgba(219,39,119'],
-      ['#34d399','#059669','#064e3b', 'rgba(5,150,105'],
-      ['#60a5fa','#2563eb','#1e3a8a', 'rgba(37,99,235'],
-      ['#fb923c','#ea580c','#7c2d12', 'rgba(234,88,12'],
+      ['#a78bfa','#6d28d9','#4c1d95'],
+      ['#f472b6','#db2777','#9d174d'],
+      ['#34d399','#059669','#064e3b'],
+      ['#60a5fa','#2563eb','#1e3a8a'],
+      ['#fb923c','#ea580c','#7c2d12'],
     ];
-    let farbIndex = 0;
 
     function setFarbe(idx) {
-      const [h, m, d, g] = farben[idx];
-      const inner = document.getElementById('kreis-inner');
-      inner.style.background = `radial-gradient(circle at 35% 30%, ${h}, ${m} 60%, ${d})`;
-      inner.style.boxShadow = `
-        0 0 0 3px ${h}66,
-        0 0 30px ${g},0.8),
-        0 0 60px ${g},0.4),
-        inset 0 2px 6px rgba(255,255,255,0.3)`;
+      const [h, m, d] = farben[idx];
+      kreisInner.style.background = `radial-gradient(circle at 35% 30%, ${h}, ${m} 60%, ${d})`;
+    }
+
+    function kreisGroesseSetzen(g) {
+      kreis.style.width  = g + 'px';
+      kreis.style.height = g + 'px';
     }
 
     function zufallsPosition() {
-      const margin = 80;
+      const half   = kreisGroesse / 2;
+      const margin = half + 20;
       const topOff = 90;
       const botOff = 75;
-      const half = kreisGroesse / 2;
-      const x = margin + Math.random() * (window.innerWidth - 2 * margin);
+      const x = margin + Math.random() * (window.innerWidth  - 2 * margin);
       const y = topOff + margin + Math.random() * (window.innerHeight - topOff - botOff - 2 * margin);
       kreis.style.left = (x - half) + 'px';
       kreis.style.top  = (y - half) + 'px';
     }
 
-    function emojiAnzeigen(x, y) {
+    function zeigeGameOver(grund) {
+      spielLaeuft = false;
+      grundEl.textContent      = grund;
+      finalScoreEl.textContent = punkte;
+      gameoverEl.classList.add('aktiv');
+    }
+
+    function neustart() {
+      punkte       = 0;
+      kreisGroesse = STARTGROESSE;
+      streak       = 0;
+      farbIndex    = 0;
+      punkteEl.textContent = '0';
+      kreisGroesseSetzen(STARTGROESSE);
+      setFarbe(0);
+      gameoverEl.classList.remove('aktiv');
+      zufallsPosition();
+      setTimeout(() => { spielLaeuft = true; }, 300);
+    }
+
+    document.getElementById('neustart-btn').addEventListener('click', neustart);
+    document.getElementById('wiederholung').addEventListener('click', neustart);
+
+    document.addEventListener('click', (e) => {
+      if (!spielLaeuft) return;
+      if (!kreis.contains(e.target)) {
+        zeigeGameOver('DANEBEN! 😬');
+      }
+    });
+
+    kreis.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!spielLaeuft) return;
+
+      const rect = kreis.getBoundingClientRect();
+      const cx   = rect.left + rect.width  / 2;
+      const cy   = rect.top  + rect.height / 2;
+      const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
+      if (dist > rect.width / 2) {
+        zeigeGameOver('DANEBEN! 😬');
+        return;
+      }
+
+      punkte++;
+      streak++;
+
+      kreisGroesse = Math.max(MINGROESSE, kreisGroesse - SCHRUMPF);
+      kreisGroesseSetzen(kreisGroesse);
+
+      punkteEl.textContent = punkte;
+      punkteEl.classList.add('bump');
+      setTimeout(() => punkteEl.classList.remove('bump'), 100);
+
+      if (punkte > best) {
+        best = punkte;
+        bestEl.textContent = best;
+        localStorage.setItem('best', best);
+      }
+
+      emojiZeigen(e.clientX, e.clientY);
+      rippleZeigen(e.clientX, e.clientY);
+      partikelZeigen(e.clientX, e.clientY);
+
+      if (streak >= 5) {
+        clearTimeout(comboTimer);
+        const msgs = {5:'HOT STREAK 🔥',6:'ON FIRE 🔥',7:'UNSTOPPABLE ⚡',8:'INSANE 💥',9:'GODLIKE 👑',10:'LEGENDARY 🏆'};
+        comboEl.textContent = msgs[streak] || `BEAST MODE x${streak} 🐉`;
+        comboEl.classList.add('sichtbar');
+        comboTimer = setTimeout(() => comboEl.classList.remove('sichtbar'), 1500);
+      }
+
+      if (punkte % 5 === 0) {
+        farbIndex = (farbIndex + 1) % farben.length;
+        setFarbe(farbIndex);
+      }
+
+      if (kreisGroesse <= MINGROESSE) {
+        zeigeGameOver('ZU KLEIN! 😅');
+        return;
+      }
+
+      zufallsPosition();
+    });
+
+    function emojiZeigen(x, y) {
       const el = document.createElement('div');
-      el.className = 'plus-eins';
+      el.className   = 'emoji-pop';
       el.textContent = '😂';
-      el.style.fontSize = '30px';
-      el.style.left = (x - 15) + 'px';
-      el.style.top  = (y - 20) + 'px';
+      el.style.left  = (x - 15) + 'px';
+      el.style.top   = (y - 20) + 'px';
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 900);
     }
 
-    function ripple(x, y) {
+    function rippleZeigen(x, y) {
       const el = document.createElement('div');
-      el.className = 'ripple';
+      el.className  = 'ripple';
       el.style.left = x + 'px';
       el.style.top  = y + 'px';
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 600);
     }
 
-    function partikelBurst(x, y) {
+    function partikelZeigen(x, y) {
       const colors = ['#a78bfa','#f472b6','#60a5fa','#34d399','#fbbf24'];
       for (let i = 0; i < 10; i++) {
-        const el = document.createElement('div');
+        const el    = document.createElement('div');
         el.className = 'partikel';
-        const angle = (i / 10) * 2 * Math.PI;
-        const dist = 40 + Math.random() * 40;
+        const angle  = (i / 10) * 2 * Math.PI;
+        const dist   = 40 + Math.random() * 40;
         el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
         el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
         el.style.background = colors[i % colors.length];
@@ -507,91 +532,7 @@
       }
     }
 
-    function updateCombo(count) {
-      clearTimeout(comboTimer);
-      if (count >= 5) {
-        const msgs = ['', '', '', '', 'HOT STREAK x5!', 'ON FIRE x6!', 'UNSTOPPABLE x7!', 'INSANE x8!', 'GODLIKE x9!', 'LEGENDARY x10+!'];
-        comboEl.textContent = msgs[Math.min(count, 10)] || `BEAST MODE x${count}!`;
-        comboEl.classList.add('sichtbar');
-        comboTimer = setTimeout(() => comboEl.classList.remove('sichtbar'), 1500);
-      }
-    }
-
-    let streak = 0;
-    let spielLaeuft = true;
-
-    const gameoverGrund = document.getElementById('gameover-grund');
-
-    function zeigeGameOver(grund) {
-      spielLaeuft = false;
-      finalScoreEl.textContent = punkte;
-      gameoverGrund.textContent = grund;
-      gameoverEl.classList.add('aktiv');
-    }
-
-    // Klick AUSSERHALB des Kreises → Game Over
-    document.addEventListener('click', (e) => {
-      if (!spielLaeuft) return;
-      if (!kreis.contains(e.target)) {
-        zeigeGameOver('DANEBEN!');
-      }
-    });
-
-    kreis.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (!spielLaeuft) return;
-
-      // Prüfen ob Klick wirklich im Kreis-Kreis (nicht nur im Bounding Box)
-      const rect = kreis.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
-      if (dist > rect.width / 2) {
-        zeigeGameOver('DANEBEN!');
-        return;
-      }
-
-      punkte++;
-      streak++;
-
-      // schrumpfen
-      kreisGroesse = Math.max(MINGROESSE, kreisGroesse - SCHRUMPF);
-      kreisGroesseSetzen(kreisGroesse);
-
-      // update score
-      punkteEl.textContent = punkte;
-      punkteEl.classList.add('bump');
-      setTimeout(() => punkteEl.classList.remove('bump'), 100);
-
-      // best score
-      if (punkte > best) {
-        best = punkte;
-        bestEl.textContent = best;
-        localStorage.setItem('best', best);
-      }
-
-      // effects
-      emojiAnzeigen(e.clientX, e.clientY);
-      ripple(e.clientX, e.clientY);
-      partikelBurst(e.clientX, e.clientY);
-      updateCombo(streak);
-
-      // change color every 5 clicks
-      if (punkte % 5 === 0) {
-        farbIndex = (farbIndex + 1) % farben.length;
-        setFarbe(farbIndex);
-      }
-
-      // game over wenn kreis minimum erreicht
-      if (kreisGroesse <= MINGROESSE) {
-        zeigeGameOver('ZU KLEIN!');
-        return;
-      }
-
-      zufallsPosition();
-    });
-
-    zufallsPosition();
+    neustart();
   </script>
 </body>
 </html>
