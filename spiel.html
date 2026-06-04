@@ -42,17 +42,6 @@
       100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.3); opacity: 0; }
     }
 
-    #weiss-flash {
-      position: fixed;
-      inset: 0;
-      background: #fff;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 490;
-      transition: opacity 0.3s ease;
-    }
-
-    #weiss-flash.aktiv { opacity: 1; }
 
     body::before {
       content: '';
@@ -416,7 +405,6 @@
   <div id="wiederholung">&#x21BA; Neustart</div>
 
   <div id="explosion"></div>
-  <div id="weiss-flash"></div>
 
   <div id="gameover" onclick="event.stopPropagation()">
     <div id="gameover-grund">DANEBEN!</div>
@@ -435,7 +423,6 @@
     let streak       = 0;
     let farbIndex    = 0;
     const explosionEl = document.getElementById('explosion');
-    const weissFlash  = document.getElementById('weiss-flash');
     let explodiert    = false;
     let spielLaeuft   = false;
     let comboTimer   = null;
@@ -509,13 +496,12 @@
         explosionEl.appendChild(el);
       }
 
-      // Nach 2s: Explosion weg, weißer Blitz
+      // Nach 2s: Explosion weg, Hintergrund weiß leuchtend
       setTimeout(() => {
         explosionEl.classList.remove('aktiv');
-        weissFlash.classList.add('aktiv');
-        document.body.style.background = '#ffffff';
+        document.body.style.background = '#f0f0f0';
         document.querySelector('.orb1').style.background = '#fff';
-        document.querySelector('.orb2').style.background = '#fff';
+        document.querySelector('.orb2').style.background = '#e0e0e0';
       }, 2000);
     }
 
@@ -554,7 +540,6 @@
       setFarbe(0);
       explodiert = false;
       explosionEl.classList.remove('aktiv');
-      weissFlash.classList.remove('aktiv');
       document.body.style.background = '#0d0d1a';
       document.querySelector('.orb1').style.background = '#6366f1';
       document.querySelector('.orb2').style.background = '#ec4899';
