@@ -215,6 +215,24 @@
       100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
     }
 
+    .feuer {
+      position: absolute;
+      pointer-events: none;
+      z-index: 210;
+      animation: feuerAuf 0.7s ease-out forwards;
+    }
+
+    .feuer span {
+      position: absolute;
+      font-size: var(--size);
+      animation: feuerPartikel var(--dur) ease-out forwards;
+    }
+
+    @keyframes feuerPartikel {
+      0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.2); }
+    }
+
     .ripple {
       position: absolute;
       border-radius: 50%;
@@ -674,6 +692,7 @@
       }
 
       emojiZeigen(e.clientX, e.clientY);
+      feuerZeigen(e.clientX, e.clientY);
       rippleZeigen(e.clientX, e.clientY);
       partikelZeigen(e.clientX, e.clientY);
 
@@ -693,6 +712,29 @@
       zufallsPosition();
       timerStarten();
     });
+
+    function feuerZeigen(x, y) {
+      const symbole = ['🔥','🔥','🔥','✨','💥','🌟'];
+      const container = document.createElement('div');
+      container.className = 'feuer';
+      container.style.left = x + 'px';
+      container.style.top  = y + 'px';
+      for (let i = 0; i < 10; i++) {
+        const el    = document.createElement('span');
+        el.textContent = symbole[Math.floor(Math.random() * symbole.length)];
+        const angle = (i / 10) * 2 * Math.PI;
+        const dist  = 30 + Math.random() * 50;
+        const dur   = (0.4 + Math.random() * 0.4).toFixed(2) + 's';
+        const size  = (16 + Math.random() * 16).toFixed(0) + 'px';
+        el.style.setProperty('--dx',   Math.cos(angle) * dist + 'px');
+        el.style.setProperty('--dy',   Math.sin(angle) * dist - 20 + 'px');
+        el.style.setProperty('--dur',  dur);
+        el.style.setProperty('--size', size);
+        container.appendChild(el);
+      }
+      document.body.appendChild(container);
+      setTimeout(() => container.remove(), 800);
+    }
 
     function emojiZeigen(x, y) {
       const el = document.createElement('div');
