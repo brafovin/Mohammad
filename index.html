@@ -283,6 +283,26 @@
       transform: scaleX(0);
     }
 
+    /* Flashback */
+    @keyframes flashback {
+      0%   { background: #ff0000; }
+      10%  { background: #ff7700; }
+      20%  { background: #ffff00; }
+      30%  { background: #00ff00; }
+      40%  { background: #00ffff; }
+      50%  { background: #0000ff; }
+      60%  { background: #ff00ff; }
+      70%  { background: #ff0088; }
+      80%  { background: #ffffff; }
+      90%  { background: #000000; }
+      100% { background: #ff0000; }
+    }
+
+    body.flashback {
+      animation: flashback 0.15s linear infinite !important;
+      transition: none !important;
+    }
+
     /* Regenbogen Hintergrund */
     @keyframes regenbogen {
       0%   { background-position: 0% 50%; }
@@ -631,6 +651,11 @@
       document.querySelectorAll('.syrien-flag').forEach(el => el.remove());
     }
 
+    function flashbackStarten() {
+      document.body.classList.remove('regenbogen');
+      document.body.classList.add('flashback');
+    }
+
     function geldExplosion() {
       if (explodiert) return;
       explodiert = true;
@@ -705,6 +730,7 @@
       explodiert = false;
       explosionEl.classList.remove('aktiv');
       document.body.classList.remove('regenbogen');
+      document.body.classList.remove('flashback');
       syrienStoppen();
       timerBar.style.transition = 'none';
       timerBar.style.transform  = 'scaleX(1)';
@@ -758,6 +784,13 @@
         kreisGroesseSetzen(STARTGROESSE);
         timerBar.style.transition = 'none';
         timerBar.style.setProperty('transition', 'transform 1.5s linear', 'important');
+      }
+
+      // Ab 100: Kreis zurück auf Normalgröße + Flashback
+      if (punkte === 100) {
+        kreisGroesse = STARTGROESSE;
+        kreisGroesseSetzen(STARTGROESSE);
+        flashbackStarten();
       }
 
       // Hintergrundfarbe je nach Score
