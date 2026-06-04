@@ -427,6 +427,7 @@
       kreisGroesse = STARTGROESSE;
       streak = 0;
       farbIndex = 0;
+      spielLaeuft = true;
       punkteEl.textContent = '0';
       kreisGroesseSetzen(STARTGROESSE);
       setFarbe(0);
@@ -466,10 +467,11 @@
       kreis.style.top  = (y - 45) + 'px';
     }
 
-    function plusEins(x, y) {
+    function emojiAnzeigen(x, y) {
       const el = document.createElement('div');
       el.className = 'plus-eins';
-      el.textContent = '+1';
+      el.textContent = '😂';
+      el.style.fontSize = '30px';
       el.style.left = (x - 15) + 'px';
       el.style.top  = (y - 20) + 'px';
       document.body.appendChild(el);
@@ -513,13 +515,23 @@
     }
 
     let streak = 0;
+    let spielLaeuft = true;
+
+    // Klick AUSSERHALB des Kreises → Game Over
+    document.addEventListener('click', (e) => {
+      if (!spielLaeuft) return;
+      if (!kreis.contains(e.target)) {
+        spielLaeuft = false;
+        finalScoreEl.textContent = punkte;
+        gameoverEl.classList.add('aktiv');
+      }
+    });
+
     kreis.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!spielLaeuft) return;
       punkte++;
       streak++;
-
-      // schrumpfen
-      kreisGroesse = Math.max(MINGROESSE, kreisGroesse - SCHRUMPF);
-      kreisGroesseSetzen(kreisGroesse);
 
       // update score
       punkteEl.textContent = punkte;
@@ -534,7 +546,7 @@
       }
 
       // effects
-      plusEins(e.clientX, e.clientY);
+      emojiAnzeigen(e.clientX, e.clientY);
       ripple(e.clientX, e.clientY);
       partikelBurst(e.clientX, e.clientY);
       updateCombo(streak);
@@ -543,13 +555,6 @@
       if (punkte % 5 === 0) {
         farbIndex = (farbIndex + 1) % farben.length;
         setFarbe(farbIndex);
-      }
-
-      // game over wenn kreis minimum erreicht
-      if (kreisGroesse <= MINGROESSE) {
-        finalScoreEl.textContent = punkte;
-        gameoverEl.classList.add('aktiv');
-        return;
       }
 
       zufallsPosition();
