@@ -237,7 +237,7 @@
     }
 
     #timer-bar.lauft {
-      transition: transform 1s linear;
+      transition: transform 2s linear;
       transform: scaleX(0);
     }
 
@@ -449,7 +449,7 @@
       timerBar.classList.add('lauft');
       zeitTimer = setTimeout(() => {
         if (spielLaeuft) zeigeGameOver('ZU LANGSAM! ⏱️');
-      }, 1000);
+      }, 2000);
     }
 
     function timerStoppen() {
