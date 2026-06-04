@@ -255,6 +255,91 @@
       text-transform: uppercase;
     }
 
+    /* Wiederholung button */
+    #wiederholung {
+      position: fixed;
+      bottom: 15px;
+      right: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 200;
+    }
+
+    #wiederholung:hover {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    /* Game Over overlay */
+    #gameover {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(10px);
+      z-index: 300;
+      gap: 20px;
+    }
+
+    #gameover.aktiv { display: flex; }
+
+    #gameover h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 36px;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(167,139,250,0.8);
+      letter-spacing: 4px;
+    }
+
+    #gameover p {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 2px;
+    }
+
+    #gameover .final-score {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 64px;
+      font-weight: 900;
+      color: #a78bfa;
+      text-shadow: 0 0 40px rgba(167,139,250,0.8);
+    }
+
+    #gameover button {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(135deg, #6d28d9, #4c1d95);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(109,40,217,0.5);
+      transition: transform 0.1s, box-shadow 0.1s;
+      margin-top: 10px;
+    }
+
+    #gameover button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 35px rgba(109,40,217,0.8);
+    }
+
     /* Particle burst */
     .partikel {
       position: absolute;
@@ -303,17 +388,53 @@
     <span>Tippe den Kreis</span>
   </div>
 
+  <!-- WIEDERHOLUNG BUTTON -->
+  <div id="wiederholung">&#x21BA; Wiederholung</div>
+
+  <!-- GAME OVER SCREEN -->
+  <div id="gameover">
+    <p>GAME OVER</p>
+    <div class="final-score" id="final-score">0</div>
+    <p>Punkte erreicht</p>
+    <button onclick="neustart()">&#x21BA; Nochmal spielen</button>
+  </div>
+
   <script>
     let punkte = 0;
     let best = parseInt(localStorage.getItem('best') || '0');
     let comboTimer = null;
+    const STARTGROESSE = 90;
+    const MINGROESSE = 12;
+    const SCHRUMPF = 4; // px pro klick
+    let kreisGroesse = STARTGROESSE;
 
     const kreis = document.getElementById('kreis');
     const punkteEl = document.getElementById('punkte');
     const bestEl = document.getElementById('best-wert');
     const comboEl = document.getElementById('combo');
+    const gameoverEl = document.getElementById('gameover');
+    const finalScoreEl = document.getElementById('final-score');
 
     bestEl.textContent = best;
+
+    function kreisGroesseSetzen(groesse) {
+      kreis.style.width  = groesse + 'px';
+      kreis.style.height = groesse + 'px';
+    }
+
+    function neustart() {
+      punkte = 0;
+      kreisGroesse = STARTGROESSE;
+      streak = 0;
+      farbIndex = 0;
+      punkteEl.textContent = '0';
+      kreisGroesseSetzen(STARTGROESSE);
+      setFarbe(0);
+      gameoverEl.classList.remove('aktiv');
+      zufallsPosition();
+    }
+
+    document.getElementById('wiederholung').addEventListener('click', neustart);
 
     const farben = [
       ['#a78bfa','#6d28d9','#4c1d95', 'rgba(109,40,217'],
@@ -396,6 +517,10 @@
       punkte++;
       streak++;
 
+      // schrumpfen
+      kreisGroesse = Math.max(MINGROESSE, kreisGroesse - SCHRUMPF);
+      kreisGroesseSetzen(kreisGroesse);
+
       // update score
       punkteEl.textContent = punkte;
       punkteEl.classList.add('bump');
@@ -418,6 +543,13 @@
       if (punkte % 5 === 0) {
         farbIndex = (farbIndex + 1) % farben.length;
         setFarbe(farbIndex);
+      }
+
+      // game over wenn kreis minimum erreicht
+      if (kreisGroesse <= MINGROESSE) {
+        finalScoreEl.textContent = punkte;
+        gameoverEl.classList.add('aktiv');
+        return;
       }
 
       zufallsPosition();
