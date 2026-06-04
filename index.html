@@ -219,6 +219,28 @@
       100% { opacity: 0; transform: translate(var(--dx),var(--dy)) scale(0); }
     }
 
+    #timer-bar-wrap {
+      position: fixed;
+      top: 70px;
+      left: 0; right: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.05);
+      z-index: 100;
+    }
+
+    #timer-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #6d28d9, #f472b6);
+      transform-origin: left;
+      transition: none;
+    }
+
+    #timer-bar.lauft {
+      transition: transform 1s linear;
+      transform: scaleX(0);
+    }
+
     #bottombar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -342,6 +364,11 @@
 
   <div id="combo"></div>
 
+  <!-- Timer Bar -->
+  <div id="timer-bar-wrap">
+    <div id="timer-bar"></div>
+  </div>
+
   <div id="kreis">
     <div id="kreis-inner"></div>
   </div>
@@ -361,7 +388,7 @@
 
   <script>
     const STARTGROESSE = 90;
-    const MINGROESSE   = 15;
+    const MINGROESSE   = 40;
     const SCHRUMPF     = 1.5;
 
     let punkte       = 0;
@@ -370,7 +397,9 @@
     let farbIndex    = 0;
     let spielLaeuft  = false;
     let comboTimer   = null;
+    let zeitTimer    = null;
     let best         = parseInt(localStorage.getItem('best') || '0');
+    const timerBar   = document.getElementById('timer-bar');
 
     const kreis        = document.getElementById('kreis');
     const kreisInner   = document.getElementById('kreis-inner');
@@ -412,8 +441,26 @@
       kreis.style.top  = (y - half) + 'px';
     }
 
+    function timerStarten() {
+      clearTimeout(zeitTimer);
+      timerBar.classList.remove('lauft');
+      timerBar.style.transform = 'scaleX(1)';
+      void timerBar.offsetWidth; // reflow
+      timerBar.classList.add('lauft');
+      zeitTimer = setTimeout(() => {
+        if (spielLaeuft) zeigeGameOver('ZU LANGSAM! ⏱️');
+      }, 1000);
+    }
+
+    function timerStoppen() {
+      clearTimeout(zeitTimer);
+      timerBar.classList.remove('lauft');
+      timerBar.style.transform = 'scaleX(1)';
+    }
+
     function zeigeGameOver(grund) {
       spielLaeuft = false;
+      timerStoppen();
       grundEl.textContent      = grund;
       finalScoreEl.textContent = punkte;
       gameoverEl.classList.add('aktiv');
@@ -429,7 +476,10 @@
       setFarbe(0);
       gameoverEl.classList.remove('aktiv');
       zufallsPosition();
-      setTimeout(() => { spielLaeuft = true; }, 300);
+      setTimeout(() => {
+        spielLaeuft = true;
+        timerStarten();
+      }, 300);
     }
 
     document.getElementById('neustart-btn').addEventListener('click', neustart);
@@ -488,12 +538,8 @@
         setFarbe(farbIndex);
       }
 
-      if (kreisGroesse <= MINGROESSE) {
-        zeigeGameOver('ZU KLEIN! 😅');
-        return;
-      }
-
       zufallsPosition();
+      timerStarten();
     });
 
     function emojiZeigen(x, y) {
