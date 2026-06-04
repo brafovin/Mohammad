@@ -461,10 +461,11 @@
       const margin = 80;
       const topOff = 90;
       const botOff = 75;
+      const half = kreisGroesse / 2;
       const x = margin + Math.random() * (window.innerWidth - 2 * margin);
       const y = topOff + margin + Math.random() * (window.innerHeight - topOff - botOff - 2 * margin);
-      kreis.style.left = (x - 45) + 'px';
-      kreis.style.top  = (y - 45) + 'px';
+      kreis.style.left = (x - half) + 'px';
+      kreis.style.top  = (y - half) + 'px';
     }
 
     function emojiAnzeigen(x, y) {
