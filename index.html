@@ -16,7 +16,43 @@
       overflow: hidden;
       font-family: 'Inter', Arial, sans-serif;
       user-select: none;
+      transition: background 0.8s ease;
     }
+
+    /* Geld-Explosion Overlay */
+    #explosion {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 500;
+      display: none;
+    }
+
+    #explosion.aktiv { display: block; }
+
+    .geld {
+      position: absolute;
+      font-size: 28px;
+      animation: geldFall var(--dur) ease-in forwards;
+      pointer-events: none;
+    }
+
+    @keyframes geldFall {
+      0%   { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.3); opacity: 0; }
+    }
+
+    #weiss-flash {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 490;
+      transition: opacity 0.3s ease;
+    }
+
+    #weiss-flash.aktiv { opacity: 1; }
 
     body::before {
       content: '';
@@ -379,6 +415,9 @@
 
   <div id="wiederholung">&#x21BA; Neustart</div>
 
+  <div id="explosion"></div>
+  <div id="weiss-flash"></div>
+
   <div id="gameover" onclick="event.stopPropagation()">
     <div id="gameover-grund">DANEBEN!</div>
     <div class="final-score" id="final-score">0</div>
@@ -395,7 +434,10 @@
     let kreisGroesse = STARTGROESSE;
     let streak       = 0;
     let farbIndex    = 0;
-    let spielLaeuft  = false;
+    const explosionEl = document.getElementById('explosion');
+    const weissFlash  = document.getElementById('weiss-flash');
+    let explodiert    = false;
+    let spielLaeuft   = false;
     let comboTimer   = null;
     let zeitTimer    = null;
     let best         = parseInt(localStorage.getItem('best') || '0');
@@ -441,6 +483,42 @@
       kreis.style.top  = (y - half) + 'px';
     }
 
+    function geldExplosion() {
+      if (explodiert) return;
+      explodiert = true;
+      explosionEl.innerHTML = '';
+      explosionEl.classList.add('aktiv');
+
+      const symbole = ['💰','💵','💴','💶','💷','🪙','💸'];
+      const cx = window.innerWidth  / 2;
+      const cy = window.innerHeight / 2;
+
+      for (let i = 0; i < 80; i++) {
+        const el = document.createElement('div');
+        el.className = 'geld';
+        el.textContent = symbole[Math.floor(Math.random() * symbole.length)];
+        const angle = Math.random() * 2 * Math.PI;
+        const dist  = 200 + Math.random() * Math.max(window.innerWidth, window.innerHeight);
+        const dur   = (1.2 + Math.random() * 0.8).toFixed(2) + 's';
+        el.style.setProperty('--dx',  Math.cos(angle) * dist + 'px');
+        el.style.setProperty('--dy',  Math.sin(angle) * dist + 'px');
+        el.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+        el.style.setProperty('--dur', dur);
+        el.style.left = (cx + (Math.random() - 0.5) * 100) + 'px';
+        el.style.top  = (cy + (Math.random() - 0.5) * 100) + 'px';
+        explosionEl.appendChild(el);
+      }
+
+      // Nach 2s: Explosion weg, weißer Blitz
+      setTimeout(() => {
+        explosionEl.classList.remove('aktiv');
+        weissFlash.classList.add('aktiv');
+        document.body.style.background = '#ffffff';
+        document.querySelector('.orb1').style.background = '#fff';
+        document.querySelector('.orb2').style.background = '#fff';
+      }, 2000);
+    }
+
     function timerStarten() {
       clearTimeout(zeitTimer);
       timerBar.classList.remove('lauft');
@@ -474,6 +552,9 @@
       punkteEl.textContent = '0';
       kreisGroesseSetzen(STARTGROESSE);
       setFarbe(0);
+      explodiert = false;
+      explosionEl.classList.remove('aktiv');
+      weissFlash.classList.remove('aktiv');
       document.body.style.background = '#0d0d1a';
       document.querySelector('.orb1').style.background = '#6366f1';
       document.querySelector('.orb2').style.background = '#ec4899';
@@ -519,7 +600,9 @@
       setTimeout(() => punkteEl.classList.remove('bump'), 100);
 
       // Hintergrundfarbe je nach Score
-      if (punkte >= 30) {
+      if (punkte >= 40) {
+        geldExplosion();
+      } else if (punkte >= 30) {
         document.body.style.background = '#1a1a00';
         document.querySelector('.orb1').style.background = '#ca8a04';
         document.querySelector('.orb2').style.background = '#fbbf24';
