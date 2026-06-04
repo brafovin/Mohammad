@@ -474,6 +474,9 @@
       punkteEl.textContent = '0';
       kreisGroesseSetzen(STARTGROESSE);
       setFarbe(0);
+      document.body.style.background = '#0d0d1a';
+      document.querySelector('.orb1').style.background = '#6366f1';
+      document.querySelector('.orb2').style.background = '#ec4899';
       gameoverEl.classList.remove('aktiv');
       zufallsPosition();
       setTimeout(() => {
@@ -514,6 +517,21 @@
       punkteEl.textContent = punkte;
       punkteEl.classList.add('bump');
       setTimeout(() => punkteEl.classList.remove('bump'), 100);
+
+      // Hintergrundfarbe je nach Score
+      if (punkte >= 30) {
+        document.body.style.background = '#1a1a00';
+        document.querySelector('.orb1').style.background = '#ca8a04';
+        document.querySelector('.orb2').style.background = '#fbbf24';
+      } else if (punkte >= 20) {
+        document.body.style.background = '#00101a';
+        document.querySelector('.orb1').style.background = '#1d4ed8';
+        document.querySelector('.orb2').style.background = '#60a5fa';
+      } else if (punkte >= 10) {
+        document.body.style.background = '#001a0d';
+        document.querySelector('.orb1').style.background = '#15803d';
+        document.querySelector('.orb2').style.background = '#4ade80';
+      }
 
       if (punkte > best) {
         best = punkte;
